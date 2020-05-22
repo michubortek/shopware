@@ -223,7 +223,8 @@ td.head  {
         {/block}
         {block name="document_index_table_name"}
             <td align="left" width="48%" valign="top">
-            {if $position.name == 'Versandkosten'}
+            {* If it is shipping costs position *}
+            {if $position.modus == 1}
                 {s name="DocumentIndexPositionNameShippingCosts"}{$position.name}{/s}
             {else}
                 {s name="DocumentIndexPositionNameDefault"}{$position.name|nl2br|wordwrap:65:"<br />\n"}{/s}
