@@ -456,7 +456,8 @@ class sExport implements \Enlight_Hook
             case 'hex':
                 // Escape every character into hex
                 $return = '';
-                for ($x = 0; $x < strlen($string); ++$x) {
+                $len = strlen($string);
+                for ($x = 0; $x < $len; ++$x) {
                     $return .= '%' . bin2hex($string[$x]);
                 }
 
@@ -464,7 +465,8 @@ class sExport implements \Enlight_Hook
 
             case 'hexentity':
                 $return = '';
-                for ($x = 0; $x < strlen($string); ++$x) {
+                $len = strlen($string);
+                for ($x = 0; $x < $len; ++$x) {
                     $return .= '&#x' . bin2hex($string[$x]) . ';';
                 }
 
@@ -472,7 +474,8 @@ class sExport implements \Enlight_Hook
 
             case 'decentity':
                 $return = '';
-                for ($x = 0; $x < strlen($string); ++$x) {
+                $len = strlen($string);
+                for ($x = 0; $x < $len; ++$x) {
                     $return .= '&#' . ord($string[$x]) . ';';
                 }
 
@@ -738,7 +741,7 @@ class sExport implements \Enlight_Hook
 
             // Read the fallback for the case the translation is not going to be set
             $fallbackId = $this->shop->getFallback() ? $this->shop->getFallback()->getId() : null;
-            if (!empty($fallbackId)) {
+            if ($fallbackId !== null) {
                 $sqlFallbackLanguageId = $this->db->quote($fallbackId);
                 $sql_add_join[] = "
                 LEFT JOIN s_core_translations as taf
@@ -786,7 +789,7 @@ class sExport implements \Enlight_Hook
             $sql_add_join[] = "
                 LEFT JOIN s_articles_prices as p2
                 ON p2.articledetailsID = d.id AND p2.`from`=1
-                AND p2.pricegroup='{$this->sCustomergroup['groupkey']}'
+                AND p2.pricegroup={$this->db->quote($this->sCustomergroup['groupkey'])}
                 AND p2.price!=0
             ";
             $pricefield = 'IFNULL(p2.price, p.price)';
@@ -834,7 +837,8 @@ class sExport implements \Enlight_Hook
             $sql_add_where[] = "(v.instock>={$this->sSettings['instock_filter']} OR (v.instock IS NULL AND d.instock>={$this->sSettings['instock_filter']}))";
         }
         if (!empty($this->sSettings['price_filter'])) {
-            $sql_add_where[] = "ROUND(CAST(IFNULL($grouppricefield,$pricefield)*(100+t.tax-IF(pd.discount IS NULL,0,pd.discount)-{$this->sCustomergroup['discount']})/100*{$this->sCurrency['factor']} AS DECIMAL(10,3)),2)>=" . $this->sSettings['price_filter'];
+            $price = (float) $this->sSettings['price_filter'];
+            $sql_add_where[] = "ROUND(CAST(IFNULL($grouppricefield,$pricefield)*(100+t.tax-IF(pd.discount IS NULL,0,pd.discount)-{$this->sCustomergroup['discount']})/100*{$this->sCurrency['factor']} AS DECIMAL(10,3)),2)>=" . $price;
         }
         if (!empty($this->sSettings['own_filter']) && trim($this->sSettings['own_filter'])) {
             $sql_add_where[] = '(' . $this->sSettings['own_filter'] . ')';
