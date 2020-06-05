@@ -106,6 +106,16 @@ class Type implements JsonSerializable
     /**
      * @var string
      */
+    protected $sortField;
+
+    /**
+     * @var string
+     */
+    protected $sortDirection = 'asc';
+
+    /**
+     * @var string
+     */
     protected $seoUrlTemplate = '{$type.name}/{$item[$type.viewTitleFieldName]}';
 
     /**
@@ -354,6 +364,26 @@ class Type implements JsonSerializable
         $this->seoRobots = $seoRobots;
 
         return $this;
+    }
+
+    public function getSortField(): ?string
+    {
+        return $this->sortField;
+    }
+
+    public function setSortField(?string $sortField): void
+    {
+        $this->sortField = $sortField;
+    }
+
+    public function getSortDirection(): string
+    {
+        return $this->sortDirection;
+    }
+
+    public function setSortDirection(string $sortDirection): void
+    {
+        $this->sortDirection = $sortDirection;
     }
 
     public function jsonSerialize(): array

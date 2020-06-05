@@ -25,6 +25,7 @@
 namespace Shopware\Bundle\EmotionBundle\ComponentHandler;
 
 use Shopware\Bundle\ContentTypeBundle\Services\RepositoryInterface;
+use Shopware\Bundle\ContentTypeBundle\Services\TypeProvider;
 use Shopware\Bundle\ContentTypeBundle\Structs\Criteria;
 use Shopware\Bundle\EmotionBundle\Struct\Collection\PrepareDataCollection;
 use Shopware\Bundle\EmotionBundle\Struct\Collection\ResolvedDataCollection;
@@ -39,15 +40,22 @@ class ContentTypeComponentHandler implements ComponentHandlerInterface
     private const MODE_NEWEST = 0;
     private const MODE_RANDOM = 1;
     private const MODE_SELECTED = 2;
+    private const MODE_CONTENT_TYPE = 3;
 
     /**
      * @var ContainerInterface
      */
     private $container;
 
-    public function __construct(ContainerInterface $container)
+    /**
+     * @var TypeProvider
+     */
+    private $typeProvider;
+
+    public function __construct(ContainerInterface $container, TypeProvider $typeProvider)
     {
         $this->container = $container;
+        $this->typeProvider = $typeProvider;
     }
 
     public function supports(Element $element): bool
@@ -57,14 +65,26 @@ class ContentTypeComponentHandler implements ComponentHandlerInterface
 
     public function prepare(PrepareDataCollection $collection, Element $element, ShopContextInterface $context): void
     {
+        $mode = (int) $element->getConfig()->get('mode');
+
+        if ($mode !== self::MODE_CONTENT_TYPE) {
+            return;
+        }
+
+        $type = $this->typeProvider->getType($element->getConfig()->get('content_type'));
+        $elementConfig = $element->getConfig();
+        $elementConfig->set('sortField', $type->getSortField());
+        $elementConfig->set('sortDirection', $type->getSortDirection());
     }
 
     public function handle(ResolvedDataCollection $collection, Element $element, ShopContextInterface $context): void
     {
-        /** @var RepositoryInterface $repository */
-        $repository = $this->container->get('shopware.bundle.content_type.' . $element->getConfig()->get('content_type'));
+        $elementConfig = $element->getConfig();
 
-        $mode = (int) $element->getConfig()->get('mode');
+        /** @var RepositoryInterface $repository */
+        $repository = $this->container->get('shopware.bundle.content_type.' . $elementConfig->get('content_type'));
+
+        $mode = (int) $elementConfig->get('mode');
 
         $criteria = new Criteria();
         $criteria->limit = 5;
@@ -88,7 +108,14 @@ class ContentTypeComponentHandler implements ComponentHandlerInterface
             $criteria->filter = [
                 [
                     'property' => 'id',
-                    'value' => array_filter(explode('|', $element->getConfig()->get('ids'))),
+                    'value' => array_filter(explode('|', $elementConfig->get('ids'))),
+                ],
+            ];
+        } elseif ($mode === self::MODE_CONTENT_TYPE) {
+            $criteria->sort = [
+                [
+                    'property' => $elementConfig->get('sortField'),
+                    'direction' => $elementConfig->get('sortDirection'),
                 ],
             ];
         }

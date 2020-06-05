@@ -126,6 +126,14 @@ class ContentTypesReader extends XmlReaderBase
             $item['seoRobots'] = $seoRobots;
         }
 
+        if ($sortField = self::getElementChildValueByName($element, 'sortField')) {
+            $item['sortField'] = $sortField;
+        }
+
+        if ($sortDirection = self::getElementChildValueByName($element, 'sortDirection')) {
+            $item['sortDirection'] = $sortDirection;
+        }
+
         if ($showInFrontend && (empty($viewDescriptionFieldName) || empty($viewImageFieldName) || empty($viewTitleFieldName) || empty($viewMetaTitleFieldName) || empty($viewMetaDescriptionFieldName))) {
             throw new \InvalidArgumentException('Content-Type with enabled showInFrontend requires a viewTitleFieldName, viewDescriptionFieldName, viewImageFieldName, viewMetaTitleFieldName, viewMetaDescriptionFieldName');
         }

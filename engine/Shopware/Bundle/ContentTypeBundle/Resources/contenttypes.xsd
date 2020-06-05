@@ -23,18 +23,27 @@
             <xsd:element name="showInFrontend" type="xsd:boolean" minOccurs="0" default="false"/>
             <xsd:element name="menuIcon" type="xsd:string" minOccurs="0" default="sprite-application-block"/>
             <xsd:element name="menuPosition" type="xsd:integer" minOccurs="0" default="0"/>
-            <xsd:element name="menuParent" type="xsd:string"  minOccurs="0" default="Content"/>
-            <xsd:element name="viewTitleFieldName" type="xsd:string"  minOccurs="0"/>
-            <xsd:element name="viewDescriptionFieldName" type="xsd:string"  minOccurs="0"/>
-            <xsd:element name="viewImageFieldName" type="xsd:string"  minOccurs="0"/>
-            <xsd:element name="viewMetaTitleFieldName" type="xsd:string"  minOccurs="0"/>
-            <xsd:element name="viewMetaDescriptionFieldName" type="xsd:string"  minOccurs="0"/>
-            <xsd:element name="seoUrlTemplate" type="xsd:string"  minOccurs="0"/>
-            <xsd:element name="seoRobots" type="xsd:string"  minOccurs="0"/>
+            <xsd:element name="menuParent" type="xsd:string" minOccurs="0" default="Content"/>
+            <xsd:element name="viewTitleFieldName" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="viewDescriptionFieldName" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="viewImageFieldName" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="viewMetaTitleFieldName" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="viewMetaDescriptionFieldName" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="seoUrlTemplate" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="sortField" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="sortDirection" type="sortDirection" minOccurs="0" default="asc"/>
+            <xsd:element name="seoRobots" type="xsd:string" minOccurs="0"/>
             <xsd:element name="fieldSets" type="fieldSetType"/>
             <xsd:element name="custom" type="custom" minOccurs="0"/>
         </xsd:sequence>
     </xsd:complexType>
+
+    <xsd:simpleType name="sortDirection">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="asc"/>
+            <xsd:enumeration value="desc"/>
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <xsd:complexType name="fieldSetType">
         <xsd:sequence>

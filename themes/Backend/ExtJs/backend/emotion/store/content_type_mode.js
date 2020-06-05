@@ -39,6 +39,10 @@ Ext.define('Shopware.apps.Emotion.store.ContentTypeMode', {
             id: 2,
             name: '{s name="mode/2"}{/s}'
         },
+        {
+            id: 3,
+            name: '{s name="mode/3"}{/s}'
+        }
     ]
 });
 //{/block}
