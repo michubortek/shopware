@@ -9,6 +9,7 @@ This changelog references changes done in Shopware 5.6 patch versions.
 ### Additions
 
 * Added sorting to content types by adding fields `sortDirection` and `sortField`
+* Added trigger theme synchronization when theme plugin will be updated
 
 ## 5.6.7
 
