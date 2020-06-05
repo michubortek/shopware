@@ -35,6 +35,24 @@ Ext.define('Shopware.apps.ContentTypeManager.view.detail.Type', {
     },
 
     /**
+     * Fix emptying field with forceSelection: true
+     * @returns { Object }
+     */
+    createModelField: function (model, field, alias, customConfig) {
+        field = this.callParent(arguments);
+
+        if (field.name !== 'sortField') {
+            return field;
+        }
+
+        field.getSubmitData = function () {
+            return this.getModelData();
+        };
+
+        return field;
+    },
+
+    /**
      * configure the fields
      * @returns { Object }
      */
@@ -73,6 +91,36 @@ Ext.define('Shopware.apps.ContentTypeManager.view.detail.Type', {
                                 change: this.frontendVisibilityListener,
                                 scope: this
                             }
+                        },
+                        sortField: {
+                            fieldLabel: '{s name="view/sortField"}{/s}',
+                            xtype: 'combobox',
+                            valueField: 'name',
+                            displayField: 'label',
+                            queryMode: 'local',
+                            labelWidth: 150,
+                            forceSelection: true,
+                            listeners: {
+                                expand: this.resetFilters,
+                                change: function (me, newValue) {
+                                    if (newValue === null) {
+                                        console.log("reset");
+                                        this.reset();
+                                        console.log(this.getValue());
+                                        console.log(this.getRawValue());
+                                    }
+                                }
+                            }
+                        },
+                        sortDirection: {
+                            fieldLabel: '{s name="view/sortDirection"}{/s}',
+                            xtype: 'combobox',
+                            valueField: 'direction',
+                            displayField: 'label',
+                            queryMode: 'local',
+                            labelWidth: 150,
+                            forceSelection: true,
+                            store: this.createDirectionStore()
                         },
                         viewTitleFieldName: {
                             fieldLabel: '{s name="view/titleField"}{/s}',
@@ -171,6 +219,7 @@ Ext.define('Shopware.apps.ContentTypeManager.view.detail.Type', {
             this.down('[name="viewImageFieldName"]'),
             this.down('[name="viewMetaTitleFieldName"]'),
             this.down('[name="viewMetaDescriptionFieldName"]'),
+            this.down('[name="sortField"]'),
         ];
 
         fields.forEach(function (field) {
@@ -278,6 +327,16 @@ Ext.define('Shopware.apps.ContentTypeManager.view.detail.Type', {
 
     resetFilters: function () {
         this.store.clearFilter();
+    },
+
+    createDirectionStore: function () {
+        return new Ext.data.SimpleStore({
+            fields: ['direction', 'label'],
+            data: [
+                ['asc', '{s name="view/sorting/asc"}{/s}'],
+                ['desc', '{s name="view/sorting/desc"}{/s}'],
+            ]
+        });
     }
 });
 // {/block}

@@ -107,6 +107,14 @@ class TypeBuilder
             $class->setSeoRobots($type['seoRobots']);
         }
 
+        if (isset($type['sortField'])) {
+            $class->setSortField($type['sortField']);
+        }
+
+        if (isset($type['sortDirection'])) {
+            $class->setSortDirection($type['sortDirection']);
+        }
+
         $fieldSets = [];
         $fields = [];
         foreach ($type['fieldSets'] as $fieldSet) {

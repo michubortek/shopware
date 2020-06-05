@@ -55,7 +55,7 @@ class ContentType extends \Enlight_Controller_Action
         $criteria = new Criteria();
         $criteria->offset = ($p - 1) * self::LIMIT;
         $criteria->limit = self::LIMIT;
-        $criteria->sort = [['property' => 'id', 'direction' => 'DESC']];
+        $criteria->sort = [['property' => $this->type->getSortField() ?: 'id', 'direction' => $this->type->getSortDirection()]];
 
         $this->get('events')->notify(sprintf('Content_Type_Frontend_Criteria_Creation_%s', $this->type->getInternalName()), [
             'subject' => $this,

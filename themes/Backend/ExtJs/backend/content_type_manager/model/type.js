@@ -66,6 +66,15 @@ Ext.define('Shopware.apps.ContentTypeManager.model.Type', {
             defaultValue: false
         },
         {
+            name: 'sortField',
+            type: 'string'
+        },
+        {
+            name: 'sortDirection',
+            type: 'string',
+            defaultValue: "asc"
+        },
+        {
             name: 'menuIcon',
             type: 'string',
             defaultValue: 'sprite-application-block'
