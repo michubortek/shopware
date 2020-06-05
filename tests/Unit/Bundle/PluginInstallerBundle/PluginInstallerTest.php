@@ -34,6 +34,7 @@ use Shopware\Components\Model\ModelManager;
 use Shopware\Components\Plugin\RequirementValidator;
 use Shopware\Components\ShopwareReleaseStruct;
 use Shopware\Components\Snippet\DatabaseHandler;
+use Shopware\Components\Theme\Installer;
 use Shopware\Kernel;
 
 class PluginInstallerTest extends TestCase
@@ -90,7 +91,8 @@ class PluginInstallerTest extends TestCase
             new \Enlight_Event_EventManager(),
             ['ShopwarePlugins' => __DIR__ . '/Fixtures'],
             new ShopwareReleaseStruct($releaseArray['version'], $releaseArray['version_text'], $releaseArray['revision']),
-            new NullLogger()
+            new NullLogger(),
+            $this->createMock(Installer::class)
         );
 
         $pluginInstaller->refreshPluginList($dateTime);

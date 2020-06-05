@@ -42,7 +42,6 @@ use Shopware\Components\Migrations\AbstractPluginMigration;
 use Shopware\Components\Migrations\PluginMigrationManager;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Components\Plugin as PluginBootstrap;
-use Shopware\Components\Plugin as PluginComponent;
 use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
@@ -58,6 +57,7 @@ use Shopware\Components\Plugin\XmlReader\XmlMenuReader;
 use Shopware\Components\Plugin\XmlReader\XmlPluginReader;
 use Shopware\Components\ShopwareReleaseStruct;
 use Shopware\Components\Snippet\DatabaseHandler;
+use Shopware\Components\Theme\Installer as ThemeInstaller;
 use Shopware\Kernel;
 use Shopware\Models\Plugin\Plugin;
 
@@ -109,6 +109,11 @@ class PluginInstaller
     private $logger;
 
     /**
+     * @var ThemeInstaller
+     */
+    private $themeInstaller;
+
+    /**
      * @param string|string[] $pluginDirectories
      */
     public function __construct(
@@ -119,7 +124,8 @@ class PluginInstaller
         Enlight_Event_EventManager $events,
         $pluginDirectories,
         ShopwareReleaseStruct $release,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ThemeInstaller $themeInstaller
     ) {
         $this->em = $em;
         $this->connection = $this->em->getConnection();
@@ -130,6 +136,7 @@ class PluginInstaller
         $this->pluginDirectories = (array) $pluginDirectories;
         $this->release = $release;
         $this->logger = $logger;
+        $this->themeInstaller = $themeInstaller;
     }
 
     /**
@@ -249,9 +256,12 @@ class PluginInstaller
             $plugin->setUpdateVersion(null);
             $plugin->setUpdateSource(null);
             $plugin->setUpdated(new \DateTime());
+            $plugin->setActive(true);
 
             $this->em->flush($plugin);
         });
+
+        $this->syncThemes($pluginBootstrap);
 
         return $context;
     }
@@ -602,12 +612,21 @@ SQL;
         $this->connection->executeUpdate($sql, [':pluginId' => $pluginId]);
     }
 
-    private function applyMigrations(PluginComponent $plugin, string $mode, bool $keepUserData = false): void
+    private function applyMigrations(PluginBootstrap $plugin, string $mode, bool $keepUserData = false): void
     {
         $manager = new PluginMigrationManager($this->pdo, $plugin, $this->logger);
         if (!is_dir($manager->getMigrationPath())) {
             return;
         }
         $manager->run($mode, $keepUserData);
+    }
+
+    private function syncThemes(PluginBootstrap $plugin): void
+    {
+        if (!file_exists($plugin->getPath() . '/Resources/Themes/Frontend')) {
+            return;
+        }
+
+        $this->themeInstaller->synchronize();
     }
 }
